@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # PostgreSQL база данных для Мир Танков Lesta
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mt_replays_lesta
+      POSTGRES_USER: mt_user
+      POSTGRES_PASSWORD: mt_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  # Redis для кэширования
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  # FastAPI Backend
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://mt_user:mt_password@postgres:5432/mt_replays_lesta
+      - REDIS_URL=redis://redis:6379
+      - ALLOWED_EXTENSIONS=.mtreplay
+    volumes:
+      - ./uploads:/app/uploads
+      - ./static:/app/static
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
