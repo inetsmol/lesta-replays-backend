@@ -12,3 +12,4 @@ wotreplay
 authlib
 python-dotenv
 PyJWT
+itsdangerous

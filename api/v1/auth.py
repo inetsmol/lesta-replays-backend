@@ -1,9 +1,49 @@
-@app.get("/login/google")
+import jwt
+import os
+import time
+
+from authlib.integrations.starlette_client import OAuth, OAuthError
+from dotenv import load_dotenv
+from fastapi import Request, HTTPException, APIRouter
+from fastapi.responses import RedirectResponse, JSONResponse
+
+load_dotenv()
+
+router = APIRouter()
+
+oauth = OAuth()
+oauth.register(
+    name="google",
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_id=os.environ["GOOGLE_CLIENT_ID"],
+    client_secret=os.environ["GOOGLE_CLIENT_SECRET"],
+    client_kwargs={"scope": "openid email profile"},
+)
+
+JWT_SECRET = os.environ["JWT_SECRET"]
+
+def issue_jwt(userinfo: dict) -> str:
+    payload = {
+        "sub": userinfo["sub"],           # стабильный Google user id
+        "email": userinfo.get("email"),
+        "name": userinfo.get("name"),
+        "picture": userinfo.get("picture"),
+        "exp": int(time.time()) + 60 * 60,  # 1 час
+        "iat": int(time.time()),
+        "iss": "your-app"
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+
+
+@router.get("/login/google")
 async def login_google(request: Request):
     redirect_uri = request.url_for("auth_google_callback")
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
-@app.get("/auth/google/callback")
+
+FRONTEND_REDIRECT_URL = os.getenv("FRONTEND_REDIRECT_URL", "http://127.0.0.1:5173/")
+
+@router.get("/auth/google/callback")
 async def auth_google_callback(request: Request):
     try:
         token = await oauth.google.authorize_access_token(request)
@@ -26,7 +66,7 @@ async def auth_google_callback(request: Request):
     app_jwt = issue_jwt(userinfo)
 
     # Вариант 1: положить JWT в httpOnly cookie
-    resp = RedirectResponse(url="/me")
+    resp = RedirectResponse(url=FRONTEND_REDIRECT_URL)
     resp.set_cookie(
         key="access_token",
         value=app_jwt,
@@ -37,17 +77,3 @@ async def auth_google_callback(request: Request):
         path="/"
     )
     return resp
-
-@app.get("/me")
-async def me(request: Request):
-    # Достаем JWT из куки
-    token = request.cookies.get("access_token")
-    if not token:
-        return JSONResponse(status_code=401, content={"detail": "Не авторизован"})
-
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-    except Exception:
-        return JSONResponse(status_code=401, content={"detail": "Токен недействителен"})
-
-    return {"user": {"email": payload.get("email"), "name": payload.get("name"), "picture": payload.get("picture")}}
