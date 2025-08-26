@@ -1,9 +1,14 @@
 from __future__ import annotations
+
+import os, time, jwt
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.config import CORS_ORIGINS
-from app.api.v1.replays import router as replays_router
-from app.db.init import init_tortoise
+from core.config import CORS_ORIGINS
+from api.v1.replays import router as replays_router
+from db.init import init_tortoise
+
+load_dotenv()
 
 app = FastAPI(title="WoT Record (MVP · Tortoise+SQLite)")
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 
-from app.core.config import DB_URL
+from core.config import DB_URL
 
 
 def init_tortoise(app: FastAPI) -> None:

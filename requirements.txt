@@ -8,3 +8,7 @@ aiofiles
 httpx
 python-multipart
 wotreplay
+
+authlib
+python-dotenv
+PyJWT
