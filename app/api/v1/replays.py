@@ -2,12 +2,12 @@ from __future__ import annotations
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Query
 from tortoise.expressions import Q
 
-from backend.app.schemas.replay import ReplayOut
-from backend.app.utils.storage import save_upload_async
-from backend.app.parsers.replay_ingest import parse_replay
-from backend.app.services.wn8 import wn8_single_battle_stub
+from app.schemas.replay import ReplayOut
+from app.utils.storage import save_upload_async
+from app.parsers.replay_ingest import parse_replay
+from app.services.wn8 import wn8_single_battle_stub
 
-from backend.app.models.replay import Replay
+from app.models.replay import Replay
 
 router = APIRouter(prefix="/replays", tags=["replays"])
 

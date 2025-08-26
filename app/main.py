@@ -1,9 +1,9 @@
 from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.core.config import CORS_ORIGINS
-from backend.app.api.v1.replays import router as replays_router
-from backend.app.db.init import init_tortoise
+from app.core.config import CORS_ORIGINS
+from app.api.v1.replays import router as replays_router
+from app.db.init import init_tortoise
 
 app = FastAPI(title="WoT Record (MVP · Tortoise+SQLite)")
 

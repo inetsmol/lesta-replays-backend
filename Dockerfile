@@ -12,7 +12,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем код приложения
-COPY . .
+COPY backend .
 
 # Создаём непривилегированного пользователя
 RUN useradd --create-home --shell /bin/bash app

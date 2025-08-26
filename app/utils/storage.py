@@ -6,7 +6,7 @@ from pathlib import Path
 
 import aiofiles
 
-from backend.app.core.config import UPLOAD_DIR
+from app.core.config import UPLOAD_DIR
 
 UPLOADS_PATH = Path(UPLOAD_DIR)
 UPLOADS_PATH.mkdir(exist_ok=True, parents=True)
